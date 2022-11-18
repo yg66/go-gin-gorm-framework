@@ -20,7 +20,7 @@ func ErrCodeText(errCode int) (string, bool) {
 	return message, ok
 }
 
-func UnknownErr(err error) *Response {
+func UnknownErr(err interface{}) *Response {
 	message, ok := ErrCodeText(errors.UnknownError)
 	if !ok {
 		zap.S().Errorf("Error {%v}", err)
@@ -35,16 +35,12 @@ func UnknownErr(err error) *Response {
 	}
 }
 
-func Failed(_errCode int) *Response {
-	message, ok := ErrCodeText(_errCode)
-	if !ok {
-		message = "System Error"
-	}
+func Failed(err *errors.Err) *Response {
 	response := Response{
 		Ts:        time.Now().UTC().Unix(),
 		Code:      http.StatusOK,
-		ErrorCode: _errCode,
-		Message:   message,
+		ErrorCode: err.Code,
+		Message:   err.Message,
 		Data:      nil,
 	}
 	return &response

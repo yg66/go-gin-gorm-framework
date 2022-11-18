@@ -2,66 +2,77 @@ package db
 
 import (
 	"errors"
+	"fmt"
+	"github.com/yg66/go-gin-gorm-framework/config"
 	"github.com/yg66/go-gin-gorm-framework/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+	"strings"
 )
 
-type MyDb struct {
-	MyDbConfig *model.DbConfig
-	Db         *gorm.DB
+type Db struct {
+	IDB *gorm.DB
 }
 
-func Init(dbConfig *model.DbConfig) (*MyDb, error) {
-	db := MyDb{
-		MyDbConfig: dbConfig,
+func NewDB(iDBConfig *config.DbConfig) (idb *Db, err error) {
+	var logLevel logger.LogLevel
+	switch strings.ToLower(iDBConfig.LogLevel) {
+	case "error":
+		logLevel = logger.Error
+	case "warn":
+		logLevel = logger.Warn
+	case "info":
+		logLevel = logger.Info
+	default:
+		err = fmt.Errorf("%w", errors.New("db log level is incorrect"))
+		return
 	}
-	// ---- Init Db ----
-	gormDb, err := gorm.Open(mysql.Open(dbConfig.MysqlDns), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+
+	gormDb, err := gorm.Open(mysql.Open(iDBConfig.MysqlDns), &gorm.Config{
+		Logger: logger.Default.LogMode(logLevel),
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
 	})
 	if err != nil {
-		return &db, err
+		return
 	}
-	db.Db = gormDb
-	return &db, nil
+	idb = &Db{IDB: gormDb}
+	return
 }
 
-type DatabaseApi interface {
+type IDB interface {
 	FindCacheByKey(cacheKey string) (*model.Cache, error)
-	AddCache(cache *model.Cache) (bool, error)
-	UpdateCache(cache *model.Cache) (bool, error)
+	AddCache(tx *gorm.DB, cache *model.Cache) (bool, error)
+	UpdateCache(tx *gorm.DB, cache *model.Cache) (bool, error)
 }
 
-func (m *MyDb) FindCacheByKey(cacheKey string) (*model.Cache, error) {
-	var cache model.Cache
-	tx := m.Db.Where(&model.Cache{CacheKey: cacheKey}).First(&cache)
+func (m *Db) FindCacheByKey(cacheKey string) (cache *model.Cache, err error) {
+	tx := m.IDB.Where(&model.Cache{CacheKey: cacheKey}).First(&cache)
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil, tx.Error
+		err = tx.Error
 	}
-	return &cache, nil
+	return
 }
 
-func (m *MyDb) AddCache(tx *gorm.DB, cache *model.Cache) (bool, error) {
+func (m *Db) AddCache(tx *gorm.DB, cache *model.Cache) (ok bool, err error) {
 	tx = tx.Create(&cache)
 	if tx.Error != nil {
-		return false, tx.Error
+		err = tx.Error
+		return
 	}
 	if tx.RowsAffected < 1 {
-		return false, nil
+		return
 	}
 	return true, nil
 }
 
-func (m *MyDb) UpdateCache(tx *gorm.DB, cache *model.Cache) (bool, error) {
+func (m *Db) UpdateCache(tx *gorm.DB, cache *model.Cache) (bool, error) {
 	u := model.Cache{
 		CacheValue: cache.CacheValue,
 		Expired:    cache.Expired,

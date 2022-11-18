@@ -2,14 +2,14 @@ package logger
 
 import (
 	"github.com/natefinch/lumberjack"
-	"github.com/yg66/go-gin-gorm-framework/model"
+	"github.com/yg66/go-gin-gorm-framework/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
 )
 
 // Init init logger
-func Init(config *model.LogConfig) (err error) {
+func Init(config *config.LogConfig) (err error) {
 	// Defines a log level type pointer
 	var level = new(zapcore.Level)
 	err = level.UnmarshalText([]byte(config.Level))

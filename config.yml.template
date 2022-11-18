@@ -1,37 +1,13 @@
-{
-  "basics": {
-    "is_dev": true,
-    "is_core_api_test": false,
-    "port": 10001,
-    "view_gateway": "",
-    "temp_secret": ""
-  },
-  "node": {
-    "id": 1,
-    "location": ""
-  },
-  "db": {
-    "mysql_dns": "account:password@tcp(ip:port)/database_name?charset=utf8mb4&parseTime=True&loc=UTC"
-  },
-  "reCAPTCHA": {
-    "secret": "xxx"
-  },
-  "job": {
-    "job_cycle": ""
-  },
-  "smtp": {
-    "from_email": "xxx",
-    "from_account": "xxx",
-    "from_email_passwd": "xxx",
-    "host": "xxx",
-    "port": 25
-  },
-  "log": {
-    "level": "debug",
-    "out_file": false,
-    "filename": "go-gin-gorm-framework.log",
-    "max_size": 200,
-    "max_age": 30,
-    "max_backups": 7
-  }
-}
+basics:
+    isDev: true
+    port: 10001
+db:
+    mysqlDns: account:password@tcp(ip:port)/database_name?charset=utf8mb4&parseTime=True&loc=UTC
+    logLevel: info
+log:
+    level: debug
+    out_file: false
+    filename: go-gin-gorm-framework.log
+    max_size: 200
+    max_age: 30
+    max_backups: 7

@@ -9,20 +9,20 @@ import (
 	"time"
 )
 
-type Service struct {
-	D *db.MyDb
+type CacheService struct {
+	IDB db.IDB
+	TX  *gorm.DB
 }
 
-type CacheServiceApi interface {
+type ICacheService interface {
 	TestDbTransaction() error
 }
 
-func (s *Service) TestDbTransaction() error {
+func (s *CacheService) TestDbTransaction() (err error) {
 	// open transaction
-	tx := s.D.Db.Begin()
+	tx := s.TX.Begin()
 	var (
-		ok  bool
-		err error
+		ok bool
 	)
 	defer func() {
 		// 捕获到异常，执行回滚
@@ -36,15 +36,15 @@ func (s *Service) TestDbTransaction() error {
 	}()
 	// database operations
 	//cache, _ := s.D.FindCacheByKey("authorization_640c9b6eb58c11eca67a000c2933e60c")
-	cache, err := s.D.FindCacheByKey("authorization_640c9b6eb58c11eca67a000c2933e6")
+	cache, err := s.IDB.FindCacheByKey("authorization_640c9b6eb58c11eca67a000c2933e6")
 	if err != nil {
 		return err
 	}
 	if cache == nil {
-		return errors.New(errors.DataNotFound)
+		return errors.New(errors.ServerError)
 	}
 	cache.CacheValue = "更新字段222"
-	ok, err = s.D.UpdateCache(tx, cache)
+	ok, err = s.IDB.UpdateCache(tx, cache)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (s *Service) TestDbTransaction() error {
 		CacheValue: "测试值",
 		Expired:    time.Time{}.UTC().Add(24 * time.Hour),
 	}
-	ok, err = s.D.AddCache(tx, c)
+	ok, err = s.IDB.AddCache(tx, c)
 	if err != nil {
 		return err
 	}

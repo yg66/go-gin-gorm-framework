@@ -61,7 +61,7 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 						zap.String("request", string(httpRequest)),
 					)
 					// If the connection is dead, we can't write a status to it.
-					failed := res.Failed(errors.NetworkAnomaly)
+					failed := res.Failed(errors.New(errors.NetworkAnomaly))
 					c.JSON(failed.Code, failed)
 					//c.Error(err.(error)) // nolint: errcheck
 					c.Abort()
@@ -84,11 +84,11 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				switch err.(type) {
 				case *errors.Err:
 					e := err.(*errors.Err)
-					failed := res.Failed(e.Code)
+					failed := res.Failed(e)
 					c.JSON(failed.Code, failed)
 					c.Abort()
 				default:
-					unknownErr := res.UnknownErr(nil)
+					unknownErr := res.UnknownErr(err)
 					c.JSON(http.StatusOK, unknownErr)
 					c.Abort()
 				}
@@ -101,6 +101,6 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 // HandleNotFound 404
 func HandleNotFound(c *gin.Context) {
 	zap.S().Errorf("handle not found: %v", c.Request.RequestURI)
-	c.JSON(http.StatusNotFound, res.Failed(errors.UriNotFoundOrMethodNotSupport))
+	c.JSON(http.StatusNotFound, res.Failed(errors.New(errors.UriNotFoundOrMethodNotSupport)))
 	return
 }
