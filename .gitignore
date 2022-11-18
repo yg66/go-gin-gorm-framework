@@ -18,5 +18,5 @@
 #config.json
 private.pem
 public.pem
-getway-account
+go-gin-gorm-framework
 go.sum
