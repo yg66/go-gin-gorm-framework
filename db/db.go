@@ -3,13 +3,14 @@ package db
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/yg66/go-gin-gorm-framework/config"
 	"github.com/yg66/go-gin-gorm-framework/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"strings"
 )
 
 type Db struct {
@@ -61,7 +62,7 @@ func (m *Db) FindCacheByKey(cacheKey string) (cache *model.Cache, err error) {
 }
 
 func (m *Db) AddCache(tx *gorm.DB, cache *model.Cache) (ok bool, err error) {
-	tx = tx.Create(&cache)
+	tx.Create(&cache)
 	if tx.Error != nil {
 		err = tx.Error
 		return
@@ -77,7 +78,7 @@ func (m *Db) UpdateCache(tx *gorm.DB, cache *model.Cache) (bool, error) {
 		CacheValue: cache.CacheValue,
 		Expired:    cache.Expired,
 	}
-	tx = tx.Model(cache).Updates(u)
+	tx.Model(cache).Updates(u)
 	if tx.Error != nil {
 		return false, tx.Error
 	}

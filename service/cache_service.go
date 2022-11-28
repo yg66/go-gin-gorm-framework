@@ -1,12 +1,13 @@
 package service
 
 import (
+	"time"
+
 	"github.com/yg66/go-gin-gorm-framework/common/errors"
 	"github.com/yg66/go-gin-gorm-framework/db"
 	"github.com/yg66/go-gin-gorm-framework/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"time"
 )
 
 type CacheService struct {
@@ -43,7 +44,7 @@ func (s *CacheService) TestDbTransaction() (err error) {
 	if cache == nil {
 		return errors.New(errors.ServerError)
 	}
-	cache.CacheValue = "更新字段222"
+	cache.CacheValue = "updateCol222"
 	ok, err = s.IDB.UpdateCache(tx, cache)
 	if err != nil {
 		return err
@@ -56,8 +57,8 @@ func (s *CacheService) TestDbTransaction() (err error) {
 		Model: gorm.Model{
 			ID: 144,
 		},
-		CacheKey:   "测试键",
-		CacheValue: "测试值",
+		CacheKey:   "TestKey",
+		CacheValue: "TestVal",
 		Expired:    time.Time{}.UTC().Add(24 * time.Hour),
 	}
 	ok, err = s.IDB.AddCache(tx, c)
