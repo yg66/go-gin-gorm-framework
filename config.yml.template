@@ -1,6 +1,7 @@
 basics:
     isDev: true
     port: 10001
+    stackTrace: true
 db:
     mysqlDns: account:password@tcp(ip:port)/database_name?charset=utf8mb4&parseTime=True&loc=UTC
     logLevel: info
