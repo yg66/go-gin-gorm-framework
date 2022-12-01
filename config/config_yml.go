@@ -1,8 +1,9 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -12,8 +13,9 @@ type Config struct {
 }
 
 type BasicsConfig struct {
-	IsDev bool `yaml:"isDev"`
-	Port  uint `yaml:"port"`
+	IsDev      bool `yaml:"isDev"`
+	Port       uint `yaml:"port"`
+	StackTrace bool `yaml:"stackTrace"`
 }
 
 type DbConfig struct {

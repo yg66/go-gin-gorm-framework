@@ -39,7 +39,7 @@ func GinLogger() gin.HandlerFunc {
 
 // GinRecovery gin exception handling
 func GinRecovery(stack bool) gin.HandlerFunc {
-	logger := zap.L()
+	logger := zap.S()
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
@@ -56,9 +56,11 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 
 				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
-					logger.Error(c.Request.URL.Path,
-						zap.Any("error", err),
-						zap.String("request", string(httpRequest)),
+					logger.Errorf(
+						"\n\n**************** Error ****************\n%v"+
+							"\n**************** Request ****************\n%v\n",
+						err,
+						string(httpRequest),
 					)
 					// If the connection is dead, we can't write a status to it.
 					failed := res.Failed(errors.New(errors.NetworkAnomaly))
@@ -69,15 +71,20 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					logger.Error("[Recovery from panic]",
-						zap.Any("error", err),
-						zap.String("request", string(httpRequest)),
-						zap.String("stack", string(debug.Stack())),
+					logger.Errorf(
+						"\n\n**************** Error ****************\n%v"+
+							"\n**************** Request ****************\n%v"+
+							"\n**************** Stack ****************\n%v\n",
+						err,
+						string(httpRequest),
+						string(debug.Stack()),
 					)
 				} else {
-					logger.Error("[Recovery from panic]",
-						zap.Any("error", err),
-						zap.String("request", string(httpRequest)),
+					logger.Errorf(
+						"\n\n**************** Error ****************\n%v"+
+							"\n**************** Request ****************\n%v\n",
+						err,
+						string(httpRequest),
 					)
 				}
 
@@ -102,5 +109,4 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 func HandleNotFound(c *gin.Context) {
 	zap.S().Errorf("handle not found: %v", c.Request.RequestURI)
 	c.JSON(http.StatusNotFound, res.Failed(errors.New(errors.UriNotFoundOrMethodNotSupport)))
-	return
 }

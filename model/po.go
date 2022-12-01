@@ -1,8 +1,9 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ====== config ======
@@ -14,8 +15,9 @@ type Config struct {
 }
 
 type BasicsConfig struct {
-	IsDev bool `mapstructure:"is_dev" json:"is_dev"`
-	Port  uint `mapstructure:"port" json:"port"`
+	IsDev      bool `mapstructure:"is_dev" json:"is_dev"`
+	Port       uint `mapstructure:"port" json:"port"`
+	StackTrace bool `mapstructure:"stack_trace" json:"stack_trace"`
 }
 
 type DbConfig struct {

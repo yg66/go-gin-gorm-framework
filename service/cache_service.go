@@ -26,7 +26,7 @@ func (s *CacheService) TestDbTransaction() (err error) {
 		ok bool
 	)
 	defer func() {
-		// 捕获到异常，执行回滚
+		// recover error, transaction rollback
 		if err != nil {
 			zap.S().Error(err)
 			tx.Rollback()

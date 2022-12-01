@@ -62,7 +62,7 @@ func (m *Db) FindCacheByKey(cacheKey string) (cache *model.Cache, err error) {
 }
 
 func (m *Db) AddCache(tx *gorm.DB, cache *model.Cache) (ok bool, err error) {
-	tx.Create(&cache)
+	tx = tx.Create(&cache)
 	if tx.Error != nil {
 		err = tx.Error
 		return
@@ -78,7 +78,7 @@ func (m *Db) UpdateCache(tx *gorm.DB, cache *model.Cache) (bool, error) {
 		CacheValue: cache.CacheValue,
 		Expired:    cache.Expired,
 	}
-	tx.Model(cache).Updates(u)
+	tx = tx.Model(cache).Updates(u)
 	if tx.Error != nil {
 		return false, tx.Error
 	}

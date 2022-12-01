@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/yg66/go-gin-gorm-framework/common/logger"
 	"github.com/yg66/go-gin-gorm-framework/config"
 	"github.com/yg66/go-gin-gorm-framework/db"
 	"github.com/yg66/go-gin-gorm-framework/handler"
 	"github.com/yg66/go-gin-gorm-framework/routers"
-	"log"
-	"net/http"
 )
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 
 	ginEngine.NoRoute(handler.HandleNotFound)
 	ginEngine.NoMethod(handler.HandleNotFound)
-	ginEngine.Use(handler.GinLogger(), handler.GinRecovery(true), handler.Cors())
+	ginEngine.Use(handler.GinLogger(), handler.GinRecovery(iConfig.BasicsConfig.StackTrace), handler.Cors())
 
 	// load routers
 	if router, err := routers.NewRouter(idb, *iConfig); err != nil {
